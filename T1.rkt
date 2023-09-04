@@ -73,10 +73,10 @@
 ;retorna #t si  la proposicion es una
 ;  tautologia (ie  es verdadera para cualquier ambiente de evaluacion)
 (define (tautology? proposition)
-  (match (filter (lambda (i) i) (map  (lambda (i) (eval proposition i))
+  (match (filter (lambda (i) (not i )) (map  (lambda (i) (eval proposition i))
                                       (all-enviroments (vars proposition))))
-    [(cons _ _) #t]
-    [(list) #f]
+    [(cons _ _) #f]
+    [(list) #t]
     ))
 
 ; --------------------P2)-----------------------
@@ -89,7 +89,10 @@
     [(notp (orp v1 v2)) (andp (notp (simplify-negations v1))(notp (simplify-negations v2)))]
     [(notp (andp v1 v2)) (orp (notp (simplify-negations v1)) (notp (simplify-negations v2)))]
     [(notp (notp v1)) (simplify-negations v1)]
-    [Prop Prop])
+    [(orp v1 v2)   (orp (simplify-negations v1) (simplify-negations v2))]
+    [(andp v1 v2)   (andp (simplify-negations v1) (simplify-negations v2))]
+    [prop prop]
+    )
   )
 
 ;----------P2b)--------------------
@@ -101,18 +104,18 @@
   (match proposition
     ;( or ) and p
     ; ( a or b ) and Prop -> (a and Prop) or (b and Prop )
-    [(andp (orp v1 v2) Prop)
+    [(andp (orp v1 v2) prop)
      (orp
       (andp (distribute-and v1)
-            (distribute-and Prop ))
+            (distribute-and prop ))
       (andp (distribute-and v2)
-            (distribute-and Prop)))]
+            (distribute-and prop)))]
 
     ; p and ( or )
     ; ; Prop and ( c or d )-> (Prop and c ) or ( Prop and d )
-    [(andp Prop (orp v3 v4))
-     (orp (andp (distribute-and Prop) (distribute-and v3))
-          (andp (distribute-and Prop) (distribute-and v4)))]
+    [(andp prop (orp v3 v4))
+     (orp (andp (distribute-and prop) (distribute-and v3))
+          (andp (distribute-and prop) (distribute-and v4)))]
 
     ;and, or externo
     [(orp v1 v2) (orp (distribute-and v1) (distribute-and v2))]
@@ -147,13 +150,11 @@
 ; dada una proposicion le aplica las transformaciones ya definidas  tantas veces como sea necesario
 ; para lograr  una  forma normal  disyuntiva
 
+
 (define (DNF prop)
   (define my-equal? (lambda (x x-new) (if (equal? x x-new) #t #f)))
-  (
-   (apply-until distribute-and my-equal?)
-   ((apply-until simplify-negations my-equal?)prop)
-   ))
-
+   ((apply-until (lambda (x) (distribute-and (simplify-negations x)))  my-equal?)  prop)
+   )
 
 ; -------------------------P3----------------------
 ; P3a)
