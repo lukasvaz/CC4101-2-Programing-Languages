@@ -146,38 +146,50 @@
 ; Para esta parte se utilizan los mismos tests que en las partes anteriores
 ; P3a)
 
-(test (fold-ocurrences (varp "a") "b") 0 )
-(test (fold-ocurrences (varp "a") "a") 1 )
-(test (fold-ocurrences (andp (varp "a") (varp "a")) "a") 2 )
-(test (fold-ocurrences (andp (varp "a") (varp "b")) "a") 1 )
-(test (fold-ocurrences  (orp(andp (varp "b") (varp "b")) (notp (varp "b"))) "b" ) 3)
-(test (fold-ocurrences  (orp(andp (varp "a") (varp "b")) (notp (varp "b"))) "b" ) 2)
-(test (fold-ocurrences  (orp(andp (varp "a") (varp "b")) (notp (varp "b"))) "b" ) 2)
+(test (ocurrences-2 (varp "a") "b") 0 )
+(test (ocurrences-2 (varp "a") "a") 1 )
+(test (ocurrences-2 (andp (varp "a") (varp "a")) "a") 2 )
+(test (ocurrences-2 (andp (varp "a") (varp "b")) "a") 1 )
+(test (ocurrences-2  (orp(andp (varp "b") (varp "b")) (notp (varp "b"))) "b" ) 3)
+(test (ocurrences-2  (orp(andp (varp "a") (varp "b")) (notp (varp "b"))) "b" ) 2)
+(test (ocurrences-2  (orp(andp (varp "a") (varp "b")) (notp (varp "b"))) "b" ) 2)
 
 ;P3b)
-(test (fold-vars (varp "a")) (list "a"))
-(test (fold-vars (andp (varp "a") (varp "b"))) (list "a" "b"))
-(test (fold-vars (andp (varp "a")(varp "a")) ) (list "a"))
-(test (fold-vars (andp(orp(andp (varp "a")(varp "a"))(varp "b"))(varp "c"))) (list "a" "b" "c"))
-(test (fold-vars (andp(orp(andp (varp "a")(varp "b"))(varp "c"))(varp "d"))) (list "a" "b" "c" "d"))
+(test (vars-2 (varp "a")) (list "a"))
+(test (vars-2 (andp (varp "a") (varp "b"))) (list "a" "b"))
+(test (vars-2 (andp (varp "a")(varp "a")) ) (list "a"))
+(test (vars-2 (andp(orp(andp (varp "a")(varp "a"))(varp "b"))(varp "c"))) (list "a" "b" "c"))
+(test (vars-2 (andp(orp(andp (varp "a")(varp "b"))(varp "c"))(varp "d"))) (list "a" "b" "c" "d"))
 
 ; P3c)
-(test (fold-simplify-negations (notp (notp (varp "a"))) ) (varp "a") )
-(test (fold-simplify-negations (notp (andp (varp "a") (varp "b"))) ) (orp (notp (varp "a")) (notp (varp "b"))) )
-(test (fold-simplify-negations (notp (orp (varp "a")(varp "b"))) ) (andp (notp (varp "a")) (notp (varp "b"))) )
-(test (fold-simplify-negations (notp (orp (notp(varp "a")) (varp "b"))) ) (andp (notp(notp (varp "a"))) (notp (varp "b"))) )
-(test (fold-simplify-negations (varp "a")) (varp "a"))
-(test (fold-simplify-negations (andp (andp  (varp "a") (varp "b"))(orp (varp "c") (varp "d")) ))
-      (andp (andp  (varp "a") (varp "b"))(orp (varp "c") (varp "d")) ) )
+(test (eval-2 (varp "a") (list (cons "a" #t))) #t )
+(test (eval-2 (varp "a") (list (cons "a" #f))) #f )
+(test/exn (eval-2 (varp "a") (list)) "eval: variable a is not defined in enviroment"  )
+; test extras
+(test (eval-2 (andp (orp (varp "a")( varp "b")) (andp (varp "a") (varp "b")))
+            (list (cons "a" #t) (cons "b" #f)))#f )
+
+(test/exn (eval-2 (andp (varp "a")(varp "b")) (list (cons "a" #t))) "eval: variable b is not defined in enviroment"  )
+
+
 
 ; P3d)
+(test (simplify-negations-2 (notp (notp (varp "a"))) ) (varp "a") )
+(test (simplify-negations-2 (notp (andp (varp "a") (varp "b"))) ) (orp (notp (varp "a")) (notp (varp "b"))) )
+(test (simplify-negations-2 (notp (orp (varp "a")(varp "b"))) ) (andp (notp (varp "a")) (notp (varp "b"))) )
+(test (simplify-negations-2 (notp (orp (notp(varp "a")) (varp "b"))) ) (andp (notp(notp (varp "a"))) (notp (varp "b"))) )
+(test (simplify-negations-2 (varp "a")) (varp "a"))
+(test (simplify-negations-2 (andp (andp  (varp "a") (varp "b"))(orp (varp "c") (varp "d")) ))
+      (andp (andp  (varp "a") (varp "b"))(orp (varp "c") (varp "d")) ) )
+
+; P3e)
 
 ; ------------------------------
-(test (fold-distribute-and (andp (orp (varp "a") (varp "b")) (varp "c"))) (orp (andp (varp "a")(varp "c"))(andp (varp "b")(varp "c"))) )
-(test (fold-distribute-and (andp (varp "c")(orp (varp "a")(varp "b")))) (orp (andp (varp "c")(varp "a"))(andp (varp "c")(varp "b"))) )
+(test (distribute-and-2 (andp (orp (varp "a") (varp "b")) (varp "c"))) (orp (andp (varp "a")(varp "c"))(andp (varp "b")(varp "c"))) )
+(test (distribute-and-2 (andp (varp "c")(orp (varp "a")(varp "b")))) (orp (andp (varp "c")(varp "a"))(andp (varp "c")(varp "b"))) )
 
 ; ; ; ( a or b ) and ( c or  d )-> (a and (c or d)) or (b and (c or d) )
-(test (fold-distribute-and (andp (orp (varp "a") (varp "b"))
+(test (distribute-and-2 (andp (orp (varp "a") (varp "b"))
                                  (orp (varp "c") (varp "d"))))
       (orp
        ( andp (varp "a") (orp (varp "c")( varp "d")))
@@ -185,14 +197,14 @@
        ) )
 
 ; ; ; ; ( a or b ) and ( c and  d )-> (a and (c and d ) ) or ( b and (c and d))
-(test (fold-distribute-and (andp (orp (varp "a") (varp "b"))
+(test (distribute-and-2 (andp (orp (varp "a") (varp "b"))
                                  (andp (varp "c") (varp "d"))))
       (orp
        (andp (varp "a") (andp (varp "c")(varp "d")))
        (andp (varp "b") (andp (varp "c")(varp "d")))) )
 
 ; ; ; ; ; (a and  b) and ( c or d )-> ((a and b) and c ) or ( (a and b) and d )
-(test (fold-distribute-and (andp (andp  (varp "a") (varp "b"))
+(test (distribute-and-2 (andp (andp  (varp "a") (varp "b"))
                                  (orp (varp "c") (varp "d")) ))
       (orp
        (andp (andp (varp "a") (varp "b")) (varp "c"))
