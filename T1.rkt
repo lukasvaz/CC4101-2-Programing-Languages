@@ -126,9 +126,8 @@
           (andp (distribute-and prop) (distribute-and v4)))]
 
     [(andp v1 v2) (andp (distribute-and v1) (distribute-and v2))]
-    
+    ;and, or externo
     [(orp v1 v2) (orp (distribute-and v1) (distribute-and v2))]
-    
     ; not
     [(notp v) (notp (distribute-and v))]
     )
