@@ -57,6 +57,9 @@
 (test (eval (andp (orp (varp "a")( varp "b")) (andp (varp "a") (varp "b")))
             (list (cons "a" #t) (cons "b" #f)))#f )
 
+(test (eval (andp (orp (varp "a")( varp "b")) (andp (varp "a") (varp "b")))
+            (list (cons "a" #t) (cons "b" #t)))#t )
+
 (test/exn (eval (andp (varp "a")(varp "b")) (list (cons "a" #t))) "eval: variable b is not defined in enviroment"  )
 
 
@@ -91,7 +94,7 @@
 ; test extras
 ; ; ; ( a or b ) and ( c or  d )-> (a and (c or d)) or (b and (c or d) )
 (test (distribute-and (andp (orp (varp "a") (varp "b"))
-                                 (orp (varp "c") (varp "d"))))
+                            (orp (varp "c") (varp "d"))))
       (orp
        ( andp (varp "a") (orp (varp "c")( varp "d")))
        ( andp (varp "b") (orp (varp "c")( varp "d")))
@@ -99,14 +102,14 @@
 
 ; ; ; ; ( a or b ) and ( c and  d )-> (a and (c and d ) ) or ( b and (c and d))
 (test (distribute-and (andp (orp (varp "a") (varp "b"))
-                                 (andp (varp "c") (varp "d"))))
+                            (andp (varp "c") (varp "d"))))
       (orp
        (andp (varp "a") (andp (varp "c")(varp "d")))
        (andp (varp "b") (andp (varp "c")(varp "d")))) )
 
 ; ; ; ; ; (a and  b) and ( c or d )-> ((a and b) and c ) or ( (a and b) and d )
 (test (distribute-and (andp (andp  (varp "a") (varp "b"))
-                                 (orp (varp "c") (varp "d")) ))
+                            (orp (varp "c") (varp "d")) ))
       (orp
        (andp (andp (varp "a") (varp "b")) (varp "c"))
        (andp (andp (varp "a")(varp "b")) (varp "d")))
@@ -165,9 +168,12 @@
 (test (eval-2 (varp "a") (list (cons "a" #t))) #t )
 (test (eval-2 (varp "a") (list (cons "a" #f))) #f )
 (test/exn (eval-2 (varp "a") (list)) "eval: variable a is not defined in enviroment"  )
-; test extras
+; ; test extras
 (test (eval-2 (andp (orp (varp "a")( varp "b")) (andp (varp "a") (varp "b")))
-            (list (cons "a" #t) (cons "b" #f)))#f )
+              (list (cons "a" #t) (cons "b" #f)))#f )
+
+(test (eval-2 (andp (orp (varp "a")( varp "b")) (andp (varp "a") (varp "b")))
+              (list (cons "a" #t) (cons "b" #t)))#t )
 
 (test/exn (eval-2 (andp (varp "a")(varp "b")) (list (cons "a" #t))) "eval: variable b is not defined in enviroment"  )
 
@@ -190,7 +196,7 @@
 
 ; ; ; ( a or b ) and ( c or  d )-> (a and (c or d)) or (b and (c or d) )
 (test (distribute-and-2 (andp (orp (varp "a") (varp "b"))
-                                 (orp (varp "c") (varp "d"))))
+                              (orp (varp "c") (varp "d"))))
       (orp
        ( andp (varp "a") (orp (varp "c")( varp "d")))
        ( andp (varp "b") (orp (varp "c")( varp "d")))
@@ -198,14 +204,14 @@
 
 ; ; ; ; ( a or b ) and ( c and  d )-> (a and (c and d ) ) or ( b and (c and d))
 (test (distribute-and-2 (andp (orp (varp "a") (varp "b"))
-                                 (andp (varp "c") (varp "d"))))
+                              (andp (varp "c") (varp "d"))))
       (orp
        (andp (varp "a") (andp (varp "c")(varp "d")))
        (andp (varp "b") (andp (varp "c")(varp "d")))) )
 
 ; ; ; ; ; (a and  b) and ( c or d )-> ((a and b) and c ) or ( (a and b) and d )
 (test (distribute-and-2 (andp (andp  (varp "a") (varp "b"))
-                                 (orp (varp "c") (varp "d")) ))
+                              (orp (varp "c") (varp "d")) ))
       (orp
        (andp (andp (varp "a") (varp "b")) (varp "c"))
        (andp (andp (varp "a")(varp "b")) (varp "d")))

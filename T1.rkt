@@ -208,10 +208,10 @@
                               (lambda (x) (if (false? (assoc x lista))
                                               (error (~a "eval: variable " x " is not defined in enviroment"))
                                               (cdr (assoc x lista) )))
-                              (lambda (x1 x2) (and (eval x1 lista ) (eval x2 lista)))
-                              (lambda (x1 x2) (or (eval x1 lista ) (eval x2 lista)))
-                              (lambda (x) (not (eval x lista )))
-                            )prop)
+                              (lambda (x1 x2) (and  x1  x2 ))
+                              (lambda (x1 x2) (or x1 x2))
+                              (lambda (x) (not x))
+                              )prop)
   )
 
 #| Parte D |#
