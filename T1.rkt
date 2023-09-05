@@ -74,7 +74,7 @@
 ;  tautologia (ie  es verdadera para cualquier ambiente de evaluacion)
 (define (tautology? proposition)
   (match (filter (lambda (i) (not i )) (map  (lambda (i) (eval proposition i))
-                                      (all-enviroments (vars proposition))))
+                                             (all-enviroments (vars proposition))))
     [(cons _ _) #f]
     [(list) #t]
     ))
@@ -86,12 +86,15 @@
 ; para distribuir las negaciones (ie ~(p or q)-> ~p and ~q).La funcion se aplica solo una vez
 (define (simplify-negations proposition)
   (match proposition
-    [(notp (orp v1 v2)) (andp (notp (simplify-negations v1))(notp (simplify-negations v2)))]
-    [(notp (andp v1 v2)) (orp (notp (simplify-negations v1)) (notp (simplify-negations v2)))]
-    [(notp (notp v1)) (simplify-negations v1)]
-    [(orp v1 v2)   (orp (simplify-negations v1) (simplify-negations v2))]
+    [(varp v) (varp v)]
     [(andp v1 v2)   (andp (simplify-negations v1) (simplify-negations v2))]
-    [prop prop]
+    [(orp v1 v2)   (orp (simplify-negations v1) (simplify-negations v2))]
+    [(notp v) (match v
+                [(varp v) (notp (varp v))]
+                [(andp v1 v2) (orp (notp (simplify-negations v1)) (notp (simplify-negations v2)))]
+                [(orp v1 v2) (andp (notp (simplify-negations v1))(notp (simplify-negations v2)))]
+                [(notp v1) (simplify-negations v1)]
+                )]
     )
   )
 
@@ -103,6 +106,8 @@
 (define (distribute-and proposition)
   (match proposition
     ;( or ) and p
+    ; caso base
+    [(varp v) (varp v)]
     ; ( a or b ) and Prop -> (a and Prop) or (b and Prop )
     [(andp (orp v1 v2) prop)
      (orp
@@ -122,8 +127,6 @@
     [(andp v1 v2) (andp (distribute-and v1) (distribute-and v2))]
     ; not
     [(notp v) (notp (distribute-and v))]
-    ; caso base
-    [(varp v) (varp v)]
     )
   )
 
@@ -153,8 +156,8 @@
 
 (define (DNF prop)
   (define my-equal? (lambda (x x-new) (if (equal? x x-new) #t #f)))
-   ((apply-until (lambda (x) (distribute-and (simplify-negations x)))  my-equal?)  prop)
-   )
+  ((apply-until (lambda (x) (distribute-and (simplify-negations x)))  my-equal?)  prop)
+  )
 
 ; -------------------------P3----------------------
 ; P3a)
@@ -167,8 +170,8 @@
   (lambda (prop)
     (match prop
       [(varp value) (f value)]
-      [(orp v1 v2) (g ((fold-prop f g h i)v1) ((fold-prop f g h i)v2))]
-      [(andp v1 v2) (h ((fold-prop f g h i ) v1) ((fold-prop f g h i) v2))]
+      [(andp v1 v2) (g ((fold-prop f g h i ) v1) ((fold-prop f g h i) v2))]
+      [(orp v1 v2) (h ((fold-prop f g h i)v1) ((fold-prop f g h i)v2))]
       [(notp v1) (i ((fold-prop f g h i) v1))])))
 
 ; P3 b)
@@ -199,8 +202,8 @@
 
 (define (fold-simplify-negations proposition)
   ((fold-prop (lambda (x) (varp x))
-              (lambda (v1 v2) (orp v1  v2))
               (lambda (v1 v2) (andp v1  v2))
+              (lambda (v1 v2) (orp v1  v2))
               (lambda (prop)
                 (match prop
                   [(varp v) (notp (varp v)) ]
@@ -216,7 +219,6 @@
 (define (fold-distribute-and proposition)
 
   (( fold-prop (lambda (x) (varp x))
-               (lambda (x1 x2) (orp x1 x2))
                (lambda (x1 x2)
                  (
                   match (andp x1 x2)
@@ -226,6 +228,7 @@
                    [_ (andp x1 x2)]
                    ))
 
+               (lambda (x1 x2) (orp x1 x2))
                (lambda (x) (notp x))) proposition)
   )
 
