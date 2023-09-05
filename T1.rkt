@@ -108,7 +108,10 @@
     ;( or ) and p
     ; caso base
     [(varp v) (varp v)]
+    
+    
     ; ( a or b ) and Prop -> (a and Prop) or (b and Prop )
+    
     [(andp (orp v1 v2) prop)
      (orp
       (andp (distribute-and v1)
@@ -122,9 +125,10 @@
      (orp (andp (distribute-and prop) (distribute-and v3))
           (andp (distribute-and prop) (distribute-and v4)))]
 
-    ;and, or externo
-    [(orp v1 v2) (orp (distribute-and v1) (distribute-and v2))]
     [(andp v1 v2) (andp (distribute-and v1) (distribute-and v2))]
+    
+    [(orp v1 v2) (orp (distribute-and v1) (distribute-and v2))]
+    
     ; not
     [(notp v) (notp (distribute-and v))]
     )
@@ -233,7 +237,3 @@
   )
 
 
-;     ; not
-;     [(notp v) (notp (distribute-and v))]
-;     )
-;   )
