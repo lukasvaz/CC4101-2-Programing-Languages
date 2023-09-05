@@ -20,9 +20,9 @@
 (define (ocurrences prop s)
   (match prop
     [(varp value) (if (equal? value s) 1 0)]
-    [(notp v1) (ocurrences v1 s)]
     [(andp v1 v2) (+ (ocurrences v1 s) (ocurrences v2 s))]
     [(orp v1 v2) (+ (ocurrences v1 s) (ocurrences v2 s))]
+    [(notp v1) (ocurrences v1 s)]
     )
   )
 
@@ -32,9 +32,9 @@
 (define (vars prop)
   (match prop
     [(varp value) (list value)]
-    [(notp v1) (vars v1)]
     [(andp v1 v2) (remove-duplicates (append (vars v1) (vars v2)))]
     [(orp v1 v2) (remove-duplicates (append (vars v1) (vars v2)))]
+    [(notp v1) (vars v1)]
     ) )
 
 ;----------P1d)--------------------
@@ -61,8 +61,8 @@
   (match proposition
     [(varp v1) (if (false? (assoc v1 lista)) (error (~a "eval: variable " v1 " is not defined in enviroment"))
                    (cdr(assoc v1 lista)))]
-    [(orp v1 v2)(or (eval v1 lista ) (eval v2 lista))]
     [(andp v1 v2)(and (eval v1 lista ) (eval v2 lista))]
+    [(orp v1 v2)(or (eval v1 lista ) (eval v2 lista))]
     [(notp v1)(not (eval v1 lista ))]
     )
   )
