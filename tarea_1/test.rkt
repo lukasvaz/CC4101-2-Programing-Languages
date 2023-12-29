@@ -1,5 +1,5 @@
 #lang play
-(print-only-errors true)
+; (print-only-errors true)
 
 (require "T1.rkt")
 
